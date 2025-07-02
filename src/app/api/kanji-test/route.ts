@@ -1,16 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
-import mongoose from 'mongoose'
-import { KanjiQuestion } from '../../../models/TestQuestion'
 
-// MongoDB接続ヘルパー
-async function connectDB() {
-  if (mongoose.connections[0].readyState) {
-    return
-  }
-  await mongoose.connect(process.env.MONGODB_URI as string)
-}
+// MongoDB関連のインポートを一時的にコメントアウト
+// import mongoose from 'mongoose'
+// import { KanjiQuestion } from '../../../models/TestQuestion'
+
+// MongoDB接続ヘルパー（一時的に無効化）
+// async function connectDB() {
+//   if (mongoose.connections[0].readyState) {
+//     return
+//   }
+//   await mongoose.connect(process.env.MONGODB_URI as string)
+// }
 
 interface KanjiQuestionData {
+  _id: string
   grade: number
   question: string
   options: string[]
@@ -23,6 +26,7 @@ interface KanjiQuestionData {
 const SAMPLE_QUESTIONS: Record<number, KanjiQuestionData[]> = {
   1: [
     {
+      _id: 'grade1_q1',
       grade: 1,
       question: 'この漢字の読み方はどれですか？「山」',
       options: ['やま', 'かわ', 'き', 'いし'],
@@ -31,6 +35,7 @@ const SAMPLE_QUESTIONS: Record<number, KanjiQuestionData[]> = {
       meaning: 'やま、山'
     },
     {
+      _id: 'grade1_q2',
       grade: 1,
       question: 'この漢字の読み方はどれですか？「人」',
       options: ['ひと', 'いり', 'おお', 'てん'],
@@ -39,6 +44,7 @@ const SAMPLE_QUESTIONS: Record<number, KanjiQuestionData[]> = {
       meaning: 'ひと、人'
     },
     {
+      _id: 'grade1_q3',
       grade: 1,
       question: 'この漢字の読み方はどれですか？「月」',
       options: ['つき', 'ひ', 'ほし', 'そら'],
@@ -47,6 +53,7 @@ const SAMPLE_QUESTIONS: Record<number, KanjiQuestionData[]> = {
       meaning: 'つき、月'
     },
     {
+      _id: 'grade1_q4',
       grade: 1,
       question: 'この漢字の読み方はどれですか？「水」',
       options: ['みず', 'ひ', 'き', 'つち'],
@@ -55,6 +62,7 @@ const SAMPLE_QUESTIONS: Record<number, KanjiQuestionData[]> = {
       meaning: 'みず、水'
     },
     {
+      _id: 'grade1_q5',
       grade: 1,
       question: 'この漢字の読み方はどれですか？「火」',
       options: ['ひ', 'みず', 'き', 'つち'],
@@ -65,6 +73,7 @@ const SAMPLE_QUESTIONS: Record<number, KanjiQuestionData[]> = {
   ],
   2: [
     {
+      _id: 'grade2_q1',
       grade: 2,
       question: 'この漢字の読み方はどれですか？「花」',
       options: ['はな', 'くさ', 'き', 'は'],
@@ -73,6 +82,7 @@ const SAMPLE_QUESTIONS: Record<number, KanjiQuestionData[]> = {
       meaning: 'はな、花'
     },
     {
+      _id: 'grade2_q2',
       grade: 2,
       question: 'この漢字の読み方はどれですか？「空」',
       options: ['そら', 'あめ', 'くも', 'かぜ'],
@@ -81,6 +91,7 @@ const SAMPLE_QUESTIONS: Record<number, KanjiQuestionData[]> = {
       meaning: 'そら、空'
     },
     {
+      _id: 'grade2_q3',
       grade: 2,
       question: 'この漢字の読み方はどれですか？「雨」',
       options: ['あめ', 'ゆき', 'かぜ', 'くも'],
@@ -89,6 +100,7 @@ const SAMPLE_QUESTIONS: Record<number, KanjiQuestionData[]> = {
       meaning: 'あめ、雨'
     },
     {
+      _id: 'grade2_q4',
       grade: 2,
       question: 'この漢字の読み方はどれですか？「手」',
       options: ['て', 'あし', 'め', 'みみ'],
@@ -97,6 +109,7 @@ const SAMPLE_QUESTIONS: Record<number, KanjiQuestionData[]> = {
       meaning: 'て、手'
     },
     {
+      _id: 'grade2_q5',
       grade: 2,
       question: 'この漢字の読み方はどれですか？「目」',
       options: ['め', 'て', 'みみ', 'はな'],
@@ -107,6 +120,7 @@ const SAMPLE_QUESTIONS: Record<number, KanjiQuestionData[]> = {
   ],
   3: [
     {
+      _id: 'grade3_q1',
       grade: 3,
       question: 'この漢字の読み方はどれですか？「音楽」',
       options: ['おんがく', 'うたごえ', 'おどり', 'えんそう'],
@@ -115,6 +129,7 @@ const SAMPLE_QUESTIONS: Record<number, KanjiQuestionData[]> = {
       meaning: 'おんがく、音楽'
     },
     {
+      _id: 'grade3_q2',
       grade: 3,
       question: 'この漢字の読み方はどれですか？「時間」',
       options: ['じかん', 'ふんびょう', 'とけい', 'にちじ'],
@@ -123,6 +138,7 @@ const SAMPLE_QUESTIONS: Record<number, KanjiQuestionData[]> = {
       meaning: 'じかん、時間'
     },
     {
+      _id: 'grade3_q3',
       grade: 3,
       question: 'この漢字の読み方はどれですか？「教室」',
       options: ['きょうしつ', 'がっこう', 'べんきょう', 'せんせい'],
@@ -131,6 +147,7 @@ const SAMPLE_QUESTIONS: Record<number, KanjiQuestionData[]> = {
       meaning: 'きょうしつ、教室'
     },
     {
+      _id: 'grade3_q4',
       grade: 3,
       question: 'この漢字の読み方はどれですか？「勉強」',
       options: ['べんきょう', 'きょうしつ', 'がっこう', 'せんせい'],
@@ -139,6 +156,7 @@ const SAMPLE_QUESTIONS: Record<number, KanjiQuestionData[]> = {
       meaning: 'べんきょう、勉強'
     },
     {
+      _id: 'grade3_q5',
       grade: 3,
       question: 'この漢字の読み方はどれですか？「友達」',
       options: ['ともだち', 'かぞく', 'せんせい', 'きょうだい'],
@@ -149,6 +167,7 @@ const SAMPLE_QUESTIONS: Record<number, KanjiQuestionData[]> = {
   ],
   4: [
     {
+      _id: 'grade4_q1',
       grade: 4,
       question: 'この漢字の読み方はどれですか？「新聞」',
       options: ['しんぶん', 'ざっし', 'てがみ', 'しょるい'],
@@ -157,6 +176,7 @@ const SAMPLE_QUESTIONS: Record<number, KanjiQuestionData[]> = {
       meaning: 'しんぶん、新聞'
     },
     {
+      _id: 'grade4_q2',
       grade: 4,
       question: 'この漢字の読み方はどれですか？「電車」',
       options: ['でんしゃ', 'じどうしゃ', 'ひこうき', 'ふね'],
@@ -165,6 +185,7 @@ const SAMPLE_QUESTIONS: Record<number, KanjiQuestionData[]> = {
       meaning: 'でんしゃ、電車'
     },
     {
+      _id: 'grade4_q3',
       grade: 4,
       question: 'この漢字の読み方はどれですか？「図書館」',
       options: ['としょかん', 'びじゅつかん', 'はくぶつかん', 'えいがかん'],
@@ -173,6 +194,7 @@ const SAMPLE_QUESTIONS: Record<number, KanjiQuestionData[]> = {
       meaning: 'としょかん、図書館'
     },
     {
+      _id: 'grade4_q4',
       grade: 4,
       question: 'この漢字の読み方はどれですか？「辞書」',
       options: ['じしょ', 'ほん', 'しんぶん', 'ざっし'],
@@ -181,6 +203,7 @@ const SAMPLE_QUESTIONS: Record<number, KanjiQuestionData[]> = {
       meaning: 'じしょ、辞書'
     },
     {
+      _id: 'grade4_q5',
       grade: 4,
       question: 'この漢字の読み方はどれですか？「病院」',
       options: ['びょういん', 'がっこう', 'こうえん', 'えき'],
@@ -191,6 +214,7 @@ const SAMPLE_QUESTIONS: Record<number, KanjiQuestionData[]> = {
   ],
   5: [
     {
+      _id: 'grade5_q1',
       grade: 5,
       question: 'この漢字の読み方はどれですか？「環境」',
       options: ['かんきょう', 'しゅうい', 'しぜん', 'じょうたい'],
@@ -199,6 +223,7 @@ const SAMPLE_QUESTIONS: Record<number, KanjiQuestionData[]> = {
       meaning: 'かんきょう、環境'
     },
     {
+      _id: 'grade5_q2',
       grade: 5,
       question: 'この漢字の読み方はどれですか？「生活」',
       options: ['せいかつ', 'じんせい', 'くらし', 'ひび'],
@@ -207,6 +232,7 @@ const SAMPLE_QUESTIONS: Record<number, KanjiQuestionData[]> = {
       meaning: 'せいかつ、生活'
     },
     {
+      _id: 'grade5_q3',
       grade: 5,
       question: 'この漢字の読み方はどれですか？「健康」',
       options: ['けんこう', 'げんき', 'たいりょく', 'じょうぶ'],
@@ -215,6 +241,7 @@ const SAMPLE_QUESTIONS: Record<number, KanjiQuestionData[]> = {
       meaning: 'けんこう、健康'
     },
     {
+      _id: 'grade5_q4',
       grade: 5,
       question: 'この漢字の読み方はどれですか？「経験」',
       options: ['けいけん', 'たいけん', 'べんきょう', 'ちしき'],
@@ -223,6 +250,7 @@ const SAMPLE_QUESTIONS: Record<number, KanjiQuestionData[]> = {
       meaning: 'けいけん、経験'
     },
     {
+      _id: 'grade5_q5',
       grade: 5,
       question: 'この漢字の読み方はどれですか？「技術」',
       options: ['ぎじゅつ', 'のうりょく', 'ちから', 'わざ'],
@@ -233,6 +261,7 @@ const SAMPLE_QUESTIONS: Record<number, KanjiQuestionData[]> = {
   ],
   6: [
     {
+      _id: 'grade6_q1',
       grade: 6,
       question: 'この漢字の読み方はどれですか？「正義」',
       options: ['せいぎ', 'こうへい', 'どうとく', 'りんり'],
@@ -241,6 +270,7 @@ const SAMPLE_QUESTIONS: Record<number, KanjiQuestionData[]> = {
       meaning: 'せいぎ、正義'
     },
     {
+      _id: 'grade6_q2',
       grade: 6,
       question: 'この漢字の読み方はどれですか？「協力」',
       options: ['きょうりょく', 'てつだい', 'えんじょ', 'しえん'],
@@ -249,6 +279,7 @@ const SAMPLE_QUESTIONS: Record<number, KanjiQuestionData[]> = {
       meaning: 'きょうりょく、協力'
     },
     {
+      _id: 'grade6_q3',
       grade: 6,
       question: 'この漢字の読み方はどれですか？「将来」',
       options: ['しょうらい', 'みらい', 'ぜんと', 'てんぼう'],
@@ -257,6 +288,7 @@ const SAMPLE_QUESTIONS: Record<number, KanjiQuestionData[]> = {
       meaning: 'しょうらい、将来'
     },
     {
+      _id: 'grade6_q4',
       grade: 6,
       question: 'この漢字の読み方はどれですか？「責任」',
       options: ['せきにん', 'ぎむ', 'やくめ', 'しごと'],
@@ -265,6 +297,7 @@ const SAMPLE_QUESTIONS: Record<number, KanjiQuestionData[]> = {
       meaning: 'せきにん、責任'
     },
     {
+      _id: 'grade6_q5',
       grade: 6,
       question: 'この漢字の読み方はどれですか？「議論」',
       options: ['ぎろん', 'はなし', 'かいぎ', 'そうだん'],
@@ -291,23 +324,8 @@ export async function GET(request: NextRequest) {
       }, { status: 400 })
     }
     
-    // データベースから問題を取得（または初期データを使用）
-    let questions: KanjiQuestionData[] = []
-    
-    try {
-      await connectDB()
-      const dbQuestions = await KanjiQuestion.find({ grade }).lean() as unknown as KanjiQuestionData[]
-      
-      // データがない場合はサンプルデータを使用
-      if (dbQuestions.length === 0) {
-        questions = SAMPLE_QUESTIONS[grade] || []
-      } else {
-        questions = dbQuestions
-      }
-    } catch (dbError) {
-      console.error('Database error:', dbError)
-      questions = SAMPLE_QUESTIONS[grade] || []
-    }
+    // 直接サンプルデータを使用（高速化のため）
+    const questions: KanjiQuestionData[] = SAMPLE_QUESTIONS[grade] || []
     
     return NextResponse.json({
       success: true,
@@ -345,23 +363,8 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
     
-    // データベースから問題を取得（または初期データを使用）
-    let questions: KanjiQuestionData[] = []
-    
-    try {
-      await connectDB()
-      const dbQuestions = await KanjiQuestion.find({ grade }).lean() as unknown as KanjiQuestionData[]
-      
-      // データがない場合はサンプルデータを使用
-      if (dbQuestions.length === 0) {
-        questions = SAMPLE_QUESTIONS[grade] || []
-      } else {
-        questions = dbQuestions
-      }
-    } catch (dbError) {
-      console.error('Database error:', dbError)
-      questions = SAMPLE_QUESTIONS[grade] || []
-    }
+    // 直接サンプルデータを使用（高速化のため）
+    const questions: KanjiQuestionData[] = SAMPLE_QUESTIONS[grade] || []
     
     // 回答を採点
     const results = questions.map((question, index) => {
