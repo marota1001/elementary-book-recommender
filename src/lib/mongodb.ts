@@ -1,7 +1,16 @@
 import { MongoClient } from 'mongodb'
 
 const uri = process.env.MONGODB_URI
-const options = {}
+
+if (!process.env.MONGODB_URI) {
+  throw new Error('Please add your Mongo URI to .env.local')
+}
+
+const options = {
+  serverSelectionTimeoutMS: 30000,
+  connectTimeoutMS: 30000,
+  socketTimeoutMS: 30000,
+}
 
 let client: MongoClient
 let clientPromise: Promise<MongoClient>
@@ -9,10 +18,6 @@ let clientPromise: Promise<MongoClient>
 // グローバル変数の型定義
 declare global {
   var _mongoClientPromise: Promise<MongoClient> | undefined
-}
-
-if (!process.env.MONGODB_URI) {
-  throw new Error('Please add your Mongo URI to .env.local')
 }
 
 if (process.env.NODE_ENV === 'development') {

@@ -1,14 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import mongoose from 'mongoose'
 import clientPromise from '../../../lib/mongodb'
-
-// MongoDB接続ヘルパー
-async function connectDB() {
-  if (mongoose.connections[0].readyState) {
-    return
-  }
-  await mongoose.connect(process.env.MONGODB_URI as string)
-}
 
 interface BookDocument {
   _id: string
@@ -308,11 +299,16 @@ function selectRandomBook(
   }
 }
 
+
+
 export async function POST(request: NextRequest) {
   try {
-    await connectDB()
+    console.log('=== Recommendations API Debug ===')
     
-    const { kanjiLevel, readingLevel, selectedGenres, userKeywords }: RecommendationRequest = await request.json()
+    const requestBody = await request.json()
+    console.log('Request body:', requestBody)
+    
+    const { kanjiLevel, readingLevel, selectedGenres, userKeywords }: RecommendationRequest = requestBody
     
     // バリデーション
     if (!kanjiLevel || !['低学年', '中学年', '高学年'].includes(kanjiLevel)) {
@@ -344,14 +340,20 @@ export async function POST(request: NextRequest) {
     }
     
     // MongoDBクライアントで直接両方のコレクションから書籍を取得
+    console.log('Connecting to MongoDB...')
     const client = await clientPromise
     const db = client.db('book-recommendation')
+    console.log('Connected to database:', db.databaseName)
     
     // booksコレクションとshogakukan_booksコレクションから書籍を取得
+    console.log('Fetching books from collections...')
     const [generalBooks, shogakukanBooksData] = await Promise.all([
       db.collection('books').find({}).toArray(),
       db.collection('shogakukan_books').find({}).toArray()
     ])
+    
+    console.log('General books count:', generalBooks.length)
+    console.log('Shogakukan books count:', shogakukanBooksData.length)
     
     // コレクション出典を明示してデータを結合
     const allBooks = [
@@ -387,11 +389,53 @@ export async function POST(request: NextRequest) {
       }))
     ] as BookDocument[]
     
+    console.log('Total books after combining:', allBooks.length)
+    
     if (allBooks.length === 0) {
+      console.log('No books found in database - returning sample recommendations')
+      // データベースが空の場合のフォールバック
       return NextResponse.json({
-        success: false,
-        message: '推薦できる書籍が見つかりません'
-      }, { status: 404 })
+        success: true,
+        message: 'サンプル推薦を生成しました（データベースにデータがありません）',
+        recommendations: [
+          {
+            book: {
+              _id: 'sample-1',
+              title: 'サンプル本1：魔法の冒険',
+              author: 'サンプル作家',
+              description: 'これはサンプルの本です。データベースに本のデータを追加してください。',
+              genres: selectedGenres,
+              readingLevel: readingLevel,
+              kanjiLevel: kanjiLevel,
+              keywords: userKeywords,
+              isFiction: true,
+              isNonfiction: false,
+              difficulty: '標準'
+            },
+            score: 0.8,
+            reason: 'データベースにデータを追加してください',
+            category: 'random' as const,
+            matchedKeywords: userKeywords
+          }
+        ],
+        metadata: {
+          totalBooks: 0,
+          recommendedCount: 1,
+          distribution: {
+            exactMatchFiction: 0,
+            exactMatchNonFiction: 0,
+            expansionFiction: 0,
+            expansionNonFiction: 0,
+            random: 1
+          },
+          userProfile: {
+            kanjiLevel,
+            readingLevel,
+            selectedGenres,
+            extractedKeywords: userKeywords
+          }
+        }
+      })
     }
     
     const recommendations: BookScore[] = []
@@ -503,11 +547,15 @@ export async function POST(request: NextRequest) {
     })
     
   } catch (error) {
-    console.error('Recommendation error:', error)
+    console.error('=== Recommendations API Error ===')
+    console.error('Error details:', error)
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace')
+    
     return NextResponse.json({
       success: false,
       message: '推薦システムでエラーが発生しました',
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : 'No stack trace'
     }, { status: 500 })
   }
 }

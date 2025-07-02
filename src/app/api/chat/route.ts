@@ -64,7 +64,7 @@ async function generateResponseWithOpenAI(userMessage: string, conversationHisto
     const currentUserMessage = { role: 'user' as const, content: userMessage }
 
     const completion = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4.1-2025-04-14',
       messages: [systemMessage, ...historyMessages, currentUserMessage],
       max_tokens: 150,
       temperature: 0.7
@@ -92,7 +92,8 @@ async function generateResponseWithOpenAI(userMessage: string, conversationHisto
       const randomResponse = responses[Math.floor(Math.random() * responses.length)]
       
       // 質問の順序: 初期メッセージ(INTEREST_QUESTIONS[0]相当)→[1]→[2]→[3]→[4]→終了
-      const questionIndex = questionCount - 1
+      // questionCount は assistant メッセージの数なので、2回目の質問なら INTEREST_QUESTIONS[1] を使う
+      const questionIndex = questionCount
       if (questionIndex >= 1 && questionIndex < INTEREST_QUESTIONS.length) {
         return `${randomResponse} ${INTEREST_QUESTIONS[questionIndex]}`
       } else {
@@ -242,7 +243,7 @@ ${BOOK_KEYWORDS.join(', ')}
 }`
 
     const completion = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4.1-2025-04-14',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: `会話内容:\n${userMessages}` }
@@ -254,13 +255,27 @@ ${BOOK_KEYWORDS.join(', ')}
     const responseText = completion.choices[0].message?.content || ''
     
     try {
-      const parsed = JSON.parse(responseText)
+      // レスポンステキストを清理（コードブロックマーカーなどを削除）
+      const cleanedText = responseText
+        .replace(/```json\s*/g, '')
+        .replace(/```\s*/g, '')
+        .trim()
+      
+      // JSONかどうかチェック（{}で始まり}で終わる）
+      if (!cleanedText.startsWith('{') || !cleanedText.endsWith('}')) {
+        console.log('Response is not valid JSON format:', cleanedText)
+        return await extractKeywordsFallback(conversationHistory)
+      }
+      
+      const parsed = JSON.parse(cleanedText)
+      
       // 選択されたキーワードが実際にリストに含まれているかチェック
       const validKeywords = Array.isArray(parsed.keywords) 
         ? parsed.keywords.filter((keyword: string) => BOOK_KEYWORDS.includes(keyword)).slice(0, 10)
         : []
       
       if (validKeywords.length === 0) {
+        console.log('No valid keywords found, using fallback')
         return await extractKeywordsFallback(conversationHistory)
       }
       
@@ -271,6 +286,7 @@ ${BOOK_KEYWORDS.join(', ')}
       }
     } catch (parseError) {
       console.error('JSON parse error:', parseError)
+      console.error('Original response text:', responseText)
       return await extractKeywordsFallback(conversationHistory)
     }
     
