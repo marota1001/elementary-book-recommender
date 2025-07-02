@@ -1,5 +1,5 @@
 import React, { memo } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, type AppRouterInstance } from 'next/navigation'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -32,7 +32,7 @@ const Layout: React.FC<LayoutProps> = memo(({
   )
 })
 
-const Header = memo(({ showHomeButton, router }: { showHomeButton: boolean, router: any }) => (
+const Header = memo(({ showHomeButton, router }: { showHomeButton: boolean, router: AppRouterInstance }) => (
   <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f0f3f4] px-10 py-3">
     <div className="flex items-center gap-4 text-[#111518]">
       <div className="size-4">

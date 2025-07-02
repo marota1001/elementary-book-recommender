@@ -27,11 +27,9 @@ interface KeywordExtractionResponse {
 
 // メッセージコンポーネントをメモ化
 const ChatMessageComponent = memo(({ 
-  message, 
-  index 
+  message
 }: {
   message: ChatMessage
-  index: number
 }) => {
   const isUser = message.role === 'user'
   
@@ -280,7 +278,6 @@ export default function ChatInterviewPage() {
       <ChatMessageComponent
         key={index}
         message={message}
-        index={index}
       />
     ))
   }, [messages])
